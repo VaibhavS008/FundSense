@@ -1,5 +1,6 @@
 package com.example.fundsense
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -21,10 +22,9 @@ class MainActivity : AppCompatActivity() {
 
         // Initialize your data
         transactions = arrayListOf(
-            MainTransactions("weekend budget", 200.00),
-            MainTransactions("weekend budget", -20.00),
-            MainTransactions("weekend budget", 100.00),
-            MainTransactions("weekend budget", -150.00)
+            MainTransactions("food", 200.00),
+            MainTransactions("movie", -20.00),
+            MainTransactions("travel", 100.00)
         )
 
         // Initialize the adapter and layout manager
@@ -37,6 +37,10 @@ class MainActivity : AppCompatActivity() {
             layoutManager = this@MainActivity.layoutManager
         }
         dataupdate()
+        binding.addBtn.setOnClickListener{
+            val intent= Intent(this,AddTActivity::class.java)
+            startActivity(intent)
+        }
     }
     private fun dataupdate(){
         val total = transactions.sumOf { it.data }
