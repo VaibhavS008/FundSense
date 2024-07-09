@@ -3,12 +3,13 @@ package com.example.fundsense
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.addTextChangedListener
+import androidx.room.Room
 import com.example.fundsense.databinding.ActivityAddTactivityBinding
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AddTActivity : AppCompatActivity() {
 
@@ -20,16 +21,14 @@ class AddTActivity : AppCompatActivity() {
         binding = ActivityAddTactivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
-
         binding.labelInput.addTextChangedListener {
-            if (it!!.count() > 0) {
+            if (it!!.isNotEmpty()) {
                 binding.labelLayout.error = null
             }
         }
 
         binding.amountInput.addTextChangedListener {
-            if (it!!.count() > 0) {
+            if (it!!.isNotEmpty()) {
                 binding.amountLayout.error = null
             }
         }
@@ -44,8 +43,20 @@ class AddTActivity : AppCompatActivity() {
             else if(amount == null) {
                 binding.amountLayout.error = "Please enter a valid amount"
             }
+            else {
+                val transaction=MainTransactions(0,label,amount)
+                insert(transaction)
+            }
         }
         binding.goback.setOnClickListener {
+            finish()
+        }
+    }
+    private fun insert(transaction :MainTransactions){
+        val  db:MainDataBase = Room.databaseBuilder(this,
+            MainDataBase::class.java, " transactions").build()
+        GlobalScope.launch {
+            db.dataAccessObj().insertAll(transaction)
             finish()
         }
     }

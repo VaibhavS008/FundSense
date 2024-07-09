@@ -5,14 +5,20 @@ import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.room.Room
 import com.example.fundsense.databinding.ActivityMainBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var transactions: ArrayList<MainTransactions>
+    private lateinit var transactions: List<MainTransactions>
     private lateinit var transactionAdapter: TransactionAdapter
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var binding: ActivityMainBinding
+    private lateinit var db:  MainDataBase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,26 +26,33 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Initialize your data
-        transactions = arrayListOf(
-            MainTransactions("food", 200.00),
-            MainTransactions("movie", -20.00),
-            MainTransactions("travel", 100.00)
-        )
+        transactions = arrayListOf()
 
-        // Initialize the adapter and layout manager
         transactionAdapter = TransactionAdapter(transactions)
         layoutManager = LinearLayoutManager(this)
 
-        // Set up the RecyclerView
+
         binding.recyclerview.apply {
             adapter = transactionAdapter
             layoutManager = this@MainActivity.layoutManager
         }
-        dataupdate()
+        db = Room.databaseBuilder(this,
+            MainDataBase::class.java,
+            "transactions").build()
+
         binding.addBtn.setOnClickListener{
             val intent= Intent(this,AddTActivity::class.java)
             startActivity(intent)
+        }
+    }
+    private fun fetching(){
+        GlobalScope.launch {
+            //db.dataAccessObj().insertAll(MainTransactions(0,"abc",-200.0))
+            transactions=db.dataAccessObj().getAll()
+            runOnUiThread{
+                dataupdate()
+                transactionAdapter.settingdata(transactions)
+            }
         }
     }
     private fun dataupdate(){
@@ -51,5 +64,10 @@ class MainActivity : AppCompatActivity() {
         binding.bal.text = "₹ %.2f".format(total)
         binding.budget.text = "₹ %.2f".format(budgetfinal)
         binding.expense.text = "₹ %.2f".format(expensefinal)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        fetching()
     }
 }

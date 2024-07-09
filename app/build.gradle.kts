@@ -1,14 +1,18 @@
 plugins {
+    //id("com.android.application")
+    //id("org.jetbrains.kotlin.android")
+    id("kotlin-kapt")
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
 }
+
 
 android {
     namespace = "com.example.fundsense"
     compileSdk = 34
 
-    viewBinding{
-        enable=true
+    viewBinding {
+        enable = true
     }
     defaultConfig {
         applicationId = "com.example.fundsense"
@@ -39,7 +43,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -49,4 +52,8 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation("com.google.android.material:material:1.7.0")
+
+    val room_version = "2.6.1"
+    implementation("androidx.room:room-ktx:$room_version")
+    kapt("androidx.room:room-compiler:$room_version")
 }

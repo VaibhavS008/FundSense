@@ -25,10 +25,10 @@ class TransactionAdapter(private var transactions: List<MainTransactions>) :
         val context = holder.data.context
 
         if(transaction.data >= 0){
-            holder.data.text = "+ $%.2f".format(transaction.data)
+            holder.data.text = "+ ₹%.2f".format(transaction.data)
             holder.data.setTextColor(ContextCompat.getColor(context, R.color.green))
         }else {
-            holder.data.text = "- $%.2f".format(Math.abs(transaction.data))
+            holder.data.text = "- ₹%.2f".format(Math.abs(transaction.data))
             holder.data.setTextColor(ContextCompat.getColor(context, R.color.red))
         }
 
@@ -38,5 +38,9 @@ class TransactionAdapter(private var transactions: List<MainTransactions>) :
 
     override fun getItemCount(): Int {
         return transactions.size
+    }
+    fun settingdata(transactions: List<MainTransactions>){
+        this.transactions= transactions
+        notifyDataSetChanged()
     }
 }
