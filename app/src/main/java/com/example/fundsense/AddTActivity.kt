@@ -53,8 +53,7 @@ class AddTActivity : AppCompatActivity() {
         }
     }
     private fun insert(transaction :MainTransactions){
-        val  db:MainDataBase = Room.databaseBuilder(this,
-            MainDataBase::class.java, " transactions").build()
+        val  db:MainDataBase = Room.databaseBuilder(this,MainDataBase::class.java, "transactions").build()
         GlobalScope.launch {
             db.dataAccessObj().insertAll(transaction)
             finish()

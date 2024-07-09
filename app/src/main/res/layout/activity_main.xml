@@ -130,5 +130,4 @@
         android:clickable="true"
         app:srcCompat="@android:drawable/ic_input_add" />
 
-
 </RelativeLayout>
