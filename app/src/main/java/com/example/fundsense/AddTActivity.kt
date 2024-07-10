@@ -1,7 +1,11 @@
 package com.example.fundsense
 
+import android.app.DatePickerDialog
+import android.icu.text.SimpleDateFormat
+import android.icu.util.Calendar
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
@@ -11,11 +15,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Locale
 
 class AddTActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddTactivityBinding
-
+    private var selectedDate: Calendar = Calendar.getInstance()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -50,13 +55,31 @@ class AddTActivity : AppCompatActivity() {
                     //Log.d("AddTActivity", "Expense Checkbox is not checked. Amount: -$amount")
                     amount
                 }
-                val transaction = MainTransactions(0, label, amount)
+                val transaction = MainTransactions(0, label, amount, selectedDate.timeInMillis)
                 insert(transaction)
             }
         }
         binding.goback.setOnClickListener {
             finish()
         }
+    }
+    fun showDatePickerDialog(view: View) {
+        val datePickerDialog = DatePickerDialog(
+            this,
+            DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
+                selectedDate.set(year, monthOfYear, dayOfMonth)
+                updateDateInput()
+            },
+            selectedDate.get(Calendar.YEAR),
+            selectedDate.get(Calendar.MONTH),
+            selectedDate.get(Calendar.DAY_OF_MONTH)
+        )
+        datePickerDialog.show()
+    }
+
+    private fun updateDateInput() {
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        binding.dateInput.setText(dateFormat.format(selectedDate.time))
     }
 
     private fun insert(transaction: MainTransactions) {

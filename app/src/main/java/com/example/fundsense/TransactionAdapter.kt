@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -14,7 +15,8 @@ class TransactionAdapter(private var transactions: List<MainTransactions>, priva
     class TransactionHolder(view: View) : RecyclerView.ViewHolder(view) {
         val label: TextView = view.findViewById(R.id.label)
         val data: TextView = view.findViewById(R.id.data)
-        val deleteBtn: Button = view.findViewById(R.id.deleteBtn)
+        val date: TextView= view.findViewById(R.id.date)
+        val deleteBtn: ImageButton = view.findViewById(R.id.deleteBtn)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionHolder {
@@ -35,6 +37,8 @@ class TransactionAdapter(private var transactions: List<MainTransactions>, priva
         }
 
         holder.label.text = transaction.label
+        holder.data.text = transaction.formattedAmount()
+        holder.date.text = transaction.formattedDate()
         holder.deleteBtn.setOnClickListener {
             onDeleteClick(transaction)
         }
