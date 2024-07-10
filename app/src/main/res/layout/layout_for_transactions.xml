@@ -25,9 +25,10 @@
         android:textSize="20sp"
         android:layout_marginEnd="12dp"
         android:text="$12"/>
-    <Button
+    <ImageButton
         android:id="@+id/deleteBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Delete" />
+        android:src="@drawable/baseline_delete_outline_24"
+    android:contentDescription="Delete transaction" />
 </LinearLayout>

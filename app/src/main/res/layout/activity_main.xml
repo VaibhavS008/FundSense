@@ -73,7 +73,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="BUDGET"
-                    android:textColor="#FFF176"
+                    android:textColor="#03811F"
                     android:textSize="20sp"
                     android:textStyle="bold"/>
             </LinearLayout>
@@ -95,7 +95,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="EXPENSE"
-                    android:textColor="#FF8A80"
+                    android:textColor="#BC1304"
                     android:textSize="20sp"
                     android:textStyle="bold"/>
             </LinearLayout>
@@ -127,6 +127,7 @@
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="176dp"
         android:layout_marginBottom="67dp"
+        android:backgroundTint="#3FC844"
         android:clickable="true"
         app:srcCompat="@android:drawable/ic_input_add" />
 
