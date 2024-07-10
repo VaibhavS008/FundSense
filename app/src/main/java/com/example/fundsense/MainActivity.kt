@@ -1,16 +1,20 @@
 package com.example.fundsense
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.room.Room
 import com.example.fundsense.databinding.ActivityMainBinding
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
 
@@ -18,7 +22,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var transactionAdapter: TransactionAdapter
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var binding: ActivityMainBinding
-    private lateinit var db:  MainDataBase
+    private lateinit var db: MainDataBase
+
+    companion object {
+        const val CHANNEL_ID = "balance_alert_channel"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,35 +35,48 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         transactions = arrayListOf()
-
         transactionAdapter = TransactionAdapter(transactions)
         layoutManager = LinearLayoutManager(this)
 
+        createNotificationChannel()
 
         binding.recyclerview.apply {
             adapter = transactionAdapter
             layoutManager = this@MainActivity.layoutManager
         }
-        db = Room.databaseBuilder(this,
-            MainDataBase::class.java,
-            "transactions").build()
+        db = Room.databaseBuilder(this, MainDataBase::class.java, "transactions").build()
 
-        binding.addBtn.setOnClickListener{
-            val intent= Intent(this,AddTActivity::class.java)
+        binding.addBtn.setOnClickListener {
+            val intent = Intent(this, AddTActivity::class.java)
             startActivity(intent)
         }
     }
-    private fun fetching(){
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "Balance Alert Channel"
+            val descriptionText = "Notifications for balance alerts"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+                description = descriptionText
+            }
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    private fun fetching() {
         GlobalScope.launch {
-            //db.dataAccessObj().insertAll(MainTransactions(0,"abc",-200.0))
-            transactions=db.dataAccessObj().getAll()
-            runOnUiThread{
+            transactions = db.dataAccessObj().getAll()
+            runOnUiThread {
                 dataupdate()
                 transactionAdapter.settingdata(transactions)
             }
         }
     }
-    private fun dataupdate(){
+
+    private fun dataupdate() {
         val total = transactions.sumOf { it.data }
         val budgetfinal = transactions.filter { it.data > 0 }.sumOf { it.data }
         val expensefinal = transactions.filter { it.data < 0 }.sumOf { it.data }
@@ -64,6 +85,29 @@ class MainActivity : AppCompatActivity() {
         binding.bal.text = "₹ %.2f".format(total)
         binding.budget.text = "₹ %.2f".format(budgetfinal)
         binding.expense.text = "₹ %.2f".format(expensefinal)
+
+        if (total <= 0) {
+            sendBalanceAlertNotification(total)
+        }
+    }
+
+    private fun sendBalanceAlertNotification(balance: Double) {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setSmallIcon(R.drawable.baseline_notifications_active_24)
+            .setContentTitle("Balance Alert")
+            .setContentText("Your balance is ₹ %.2f".format(balance))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+
+        val notificationManager: NotificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(0, builder.build())
     }
 
     override fun onResume() {
