@@ -15,6 +15,7 @@ class TransactionAdapter(private var transactions: List<MainTransactions>, priva
     class TransactionHolder(view: View) : RecyclerView.ViewHolder(view) {
         val label: TextView = view.findViewById(R.id.label)
         val data: TextView = view.findViewById(R.id.data)
+        val date: TextView= view.findViewById(R.id.date)
         val deleteBtn: ImageButton = view.findViewById(R.id.deleteBtn)
     }
 
@@ -36,6 +37,8 @@ class TransactionAdapter(private var transactions: List<MainTransactions>, priva
         }
 
         holder.label.text = transaction.label
+        holder.data.text = transaction.formattedAmount()
+        holder.date.text = transaction.formattedDate()
         holder.deleteBtn.setOnClickListener {
             onDeleteClick(transaction)
         }
