@@ -55,6 +55,13 @@
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <CheckBox
+            android:id="@+id/expenseCheckbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:text="Expense" />
+
         <Button
             android:id="@+id/addTransactionBtn"
             android:layout_width="match_parent"

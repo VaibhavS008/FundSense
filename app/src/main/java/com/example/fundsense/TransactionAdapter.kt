@@ -1,18 +1,20 @@
 package com.example.fundsense
-import android.content.Intent
+
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 
-class TransactionAdapter(private var transactions: List<MainTransactions>) :
+class TransactionAdapter(private var transactions: List<MainTransactions>, private val onDeleteClick: (MainTransactions) -> Unit) :
     RecyclerView.Adapter<TransactionAdapter.TransactionHolder>() {
 
     class TransactionHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val label : TextView = view.findViewById(R.id.label)
+        val label: TextView = view.findViewById(R.id.label)
         val data: TextView = view.findViewById(R.id.data)
+        val deleteBtn: Button = view.findViewById(R.id.deleteBtn)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionHolder {
@@ -24,23 +26,26 @@ class TransactionAdapter(private var transactions: List<MainTransactions>) :
         val transaction = transactions[position]
         val context = holder.data.context
 
-        if(transaction.data >= 0){
+        if (transaction.data >= 0) {
             holder.data.text = "+ ₹%.2f".format(transaction.data)
             holder.data.setTextColor(ContextCompat.getColor(context, R.color.green))
-        }else {
+        } else {
             holder.data.text = "- ₹%.2f".format(Math.abs(transaction.data))
             holder.data.setTextColor(ContextCompat.getColor(context, R.color.red))
         }
 
         holder.label.text = transaction.label
-
+        holder.deleteBtn.setOnClickListener {
+            onDeleteClick(transaction)
+        }
     }
 
     override fun getItemCount(): Int {
         return transactions.size
     }
-    fun settingdata(transactions: List<MainTransactions>){
-        this.transactions= transactions
+
+    fun settingdata(transactions: List<MainTransactions>) {
+        this.transactions = transactions
         notifyDataSetChanged()
     }
 }

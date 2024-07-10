@@ -1,6 +1,7 @@
 package com.example.fundsense
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
@@ -39,12 +40,17 @@ class AddTActivity : AppCompatActivity() {
 
             if (label.isEmpty()) {
                 binding.labelLayout.error = "Please enter a valid label"
-            }
-            else if(amount == null) {
+            } else if (amount == null) {
                 binding.amountLayout.error = "Please enter a valid amount"
-            }
-            else {
-                val transaction=MainTransactions(0,label,amount)
+            } else {
+                val finalAmount = if (binding.expenseCheckbox.isChecked) {
+                    //Log.d("AddTActivity", "Expense Checkbox is checked. Amount: -$amount")
+                    -amount
+                } else {
+                    //Log.d("AddTActivity", "Expense Checkbox is not checked. Amount: -$amount")
+                    amount
+                }
+                val transaction = MainTransactions(0, label, amount)
                 insert(transaction)
             }
         }
@@ -52,11 +58,21 @@ class AddTActivity : AppCompatActivity() {
             finish()
         }
     }
-    private fun insert(transaction :MainTransactions){
-        val  db:MainDataBase = Room.databaseBuilder(this,MainDataBase::class.java, "transactions").build()
+
+    private fun insert(transaction: MainTransactions) {
+        val db: MainDataBase =
+            Room.databaseBuilder(this, MainDataBase::class.java, "transactions").build()
         GlobalScope.launch {
-            db.dataAccessObj().insertAll(transaction)
-            finish()
+            val finalTransaction = if (transaction.data > 0 && binding.expenseCheckbox.isChecked) {
+                transaction.copy(data = -transaction.data)
+            } else {
+                transaction
+            }
+            db.dataAccessObj().insertAll(finalTransaction)
+            //Log.d("AddTActivity", "Inserted transaction: $finalTransaction")
+            runOnUiThread {
+                finish()
+            }
         }
     }
 }
